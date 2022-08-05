@@ -1,0 +1,10 @@
+version: "3"
+services:
+  dredd:
+    image: apiaryio/dredd:14.0.0
+    working_dir: /dredd
+    command: dredd ./openapi.yml http://localhost:3000 --hookfiles="./hooks/hooks.js" --reporter=html
+    # command: echo "hello"
+    volumes:
+      - ./dredd/:/dredd/hooks
+      - ./openapi.yml:/dredd/openapi.yml
