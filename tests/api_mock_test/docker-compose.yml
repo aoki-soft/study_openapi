@@ -2,17 +2,18 @@ version: "3"
 services:
   dredd:
     image: apiaryio/dredd:14.0.0
+    container_name: dredd
     working_dir: /dredd
-    command: dredd ./openapi.yml http://prism:4010 --hookfiles="./hooks/hooks.js" --reporter=html --output="./report/report.html"
-    # command: ls -la
+    command: dredd ./openapi.yml http://prism:4010 --hookfiles="./hooks/hooks.js" --reporter=html --output="./report/report.html" --no-color
     volumes:
-      - ./dredd/:/dredd/hooks
-      - ./openapi.yml:/dredd/openapi.yml
+      - ../../dredd/:/dredd/hooks
+      - ../../openapi.yml:/dredd/openapi.yml
       - ./data/dredd:/dredd/report/
     depends_on:
       prism: 
         condition: service_healthy
   prism:
+    container_name: prism
     image: stoplight/prism:4.10.1
     command: mock -h 0.0.0.0 ./openapi.yml
     healthcheck:
@@ -24,4 +25,4 @@ services:
     ports:
       - "4010:4010"
     volumes: 
-      - ./openapi.yml:/usr/src/prism/packages/cli/openapi.yml
+      - ../../openapi.yml:/usr/src/prism/packages/cli/openapi.yml

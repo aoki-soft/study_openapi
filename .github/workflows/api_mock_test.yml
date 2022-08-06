@@ -1,0 +1,16 @@
+name: API Mock Test
+
+on: push
+
+jobs:
+  api_mock_test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: docker-compose up
+        run: | 
+          cd ./tests/api_mock_test
+          docker-compose up --abort-on-container-exit
+          cat ./data/dredd/report.html >> $GITHUB_STEP_SUMMARY
+          echo -e "\n\`\`\`\n$(docker-compose logs --no-log-prefix -t prism)\n\`\`\`\n" >> $GITHUB_STEP_SUMMARY
+          echo -e "\n\`\`\`\n$(docker-compose logs --no-log-prefix -t dredd)\n\`\`\`\n" >> $GITHUB_STEP_SUMMARY
