@@ -6,8 +6,8 @@ services:
     working_dir: /dredd
     command: dredd ./openapi.yml http://prism:4010 --hookfiles="./hooks/hooks.js" --reporter=html --output="./report/report.html" --no-color
     volumes:
-      - ./dredd/:/dredd/hooks
-      - ./openapi.yml:/dredd/openapi.yml
+      - ../../dredd/:/dredd/hooks
+      - ../../openapi.yml:/dredd/openapi.yml
       - ./data/dredd:/dredd/report/
     depends_on:
       prism: 
@@ -25,4 +25,4 @@ services:
     ports:
       - "4010:4010"
     volumes: 
-      - ./openapi.yml:/usr/src/prism/packages/cli/openapi.yml
+      - ../../openapi.yml:/usr/src/prism/packages/cli/openapi.yml
