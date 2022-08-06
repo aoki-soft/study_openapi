@@ -8,5 +8,5 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: |-
-        docker-compose up --abort-on-container-exit\
+        docker-compose up --abort-on-container-exit 
         || echo "failed" >> $GITHUB_STEP_SUMMARY; exit 1
