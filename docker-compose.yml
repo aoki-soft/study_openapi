@@ -14,11 +14,8 @@ services:
   prism:
     image: stoplight/prism:4.10.1
     command: mock -h 0.0.0.0 ./openapi.yml
-    logging:
-      driver: local
-      options:
-        max-size: 20m
-        max-file: 5
+    # logging:
+    #   driver: local
     healthcheck:
       test: wget -q -O - http://localhost:4010/users || exit 1
       interval: 1s
