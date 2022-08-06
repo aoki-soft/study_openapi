@@ -4,11 +4,7 @@ services:
     image: apiaryio/dredd:14.0.0
     working_dir: /dredd
     command: dredd ./openapi.yml http://prism:4010 --hookfiles="./hooks/hooks.js" --reporter=html --output="./report/report.html"
-    logging:
-      driver: local
-      options:
-        max-size: 20m
-        max-file: 5
+    # command: ls -la
     volumes:
       - ./dredd/:/dredd/hooks
       - ./openapi.yml:/dredd/openapi.yml
@@ -19,11 +15,6 @@ services:
   prism:
     image: stoplight/prism:4.10.1
     command: mock -h 0.0.0.0 ./openapi.yml
-    logging:
-      driver: local
-      options:
-        max-size: 20m
-        max-file: 5
     healthcheck:
       test: wget -q -O - http://localhost:4010/users || exit 1
       interval: 1s
