@@ -12,3 +12,4 @@ jobs:
           docker-compose up --abort-on-container-exit
           cat ./data/dredd/report.html >> $GITHUB_STEP_SUMMARY
           echo -e "\n\`\`\`\n$(docker-compose logs --no-log-prefix -t prism)\n\`\`\`\n" >> $GITHUB_STEP_SUMMARY
+          echo -e "\n\`\`\`\n$(docker-compose logs --no-log-prefix -t dredd)\n\`\`\`\n" >> $GITHUB_STEP_SUMMARY
