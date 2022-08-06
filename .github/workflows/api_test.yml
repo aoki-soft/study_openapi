@@ -11,5 +11,6 @@ jobs:
         run: | 
           docker-compose up --abort-on-container-exit
           cat ./data/dredd/report.html >> $GITHUB_STEP_SUMMARY
-          docker-compose logs dredd --no-color >> $GITHUB_STEP_SUMMARY
-          docker-compose logs prism --no-color >> $GITHUB_STEP_SUMMARY
+          docker-compose logs dredd
+          docker-compose logs dredd >> $GITHUB_STEP_SUMMARY
+          docker-compose logs prism >> $GITHUB_STEP_SUMMARY
