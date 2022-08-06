@@ -7,6 +7,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: |
+      - run: |-
         docker-compose up --abort-on-container-exit\
         || echo "failed" >> $GITHUB_STEP_SUMMARY; exit 1
