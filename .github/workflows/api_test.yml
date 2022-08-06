@@ -11,5 +11,5 @@ jobs:
         run: | 
           docker-compose up --abort-on-container-exit
           cat ./data/dredd/report.html >> $GITHUB_STEP_SUMMARY
-          echo docker-compose logs --no-log-prefix -t prism >> ./prism.log
+          docker-compose logs --no-log-prefix -t prism >> ./prism.log
           cat ./prism.log >> $GITHUB_STEP_SUMMARY
