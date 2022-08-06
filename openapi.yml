@@ -37,7 +37,6 @@ paths:
             schema: # POSTするオブジェクト
               $ref: '#/components/schemas/User'
             example:
-              id:
               name: post_user
       responses:
         '201':
@@ -48,7 +47,7 @@ components:
     User: # モデル名
       type: object
       required: # 必須フィールド
-        - id
+        - name
       properties:
         id:
           type: integer
