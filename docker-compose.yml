@@ -18,7 +18,7 @@ services:
         condition: service_healthy
   prism:
     image: stoplight/prism:4.10.1
-    command: mock -h 0.0.0.0 -p 4010 ./openapi.yml
+    command: mock -h 0.0.0.0 ./openapi.yml
     logging:
       driver: local
       options:
