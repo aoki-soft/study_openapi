@@ -2,6 +2,7 @@ version: "3"
 services:
   dredd:
     image: apiaryio/dredd:14.0.0
+    container_name: dredd
     working_dir: /dredd
     command: dredd ./openapi.yml http://prism:4010 --hookfiles="./hooks/hooks.js" --reporter=html --output="./report/report.html"
     volumes:
@@ -12,6 +13,7 @@ services:
       prism: 
         condition: service_healthy
   prism:
+    container_name: prism
     image: stoplight/prism:4.10.1
     command: mock -h 0.0.0.0 ./openapi.yml
     # logging:
