@@ -5,9 +5,9 @@ on: push
 jobs:
   api_test:
     runs-on: ubuntu-latest
-    steps:
+    steps1:
       - name: checkout
       - uses: actions/checkout@v2
-    steps:
+    steps2:
       - name: docker-compose up
       - run: docker-compose up --abort-on-container-exit; echo "result" >> $GITHUB_STEP_SUMMARY
