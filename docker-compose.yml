@@ -3,8 +3,25 @@ services:
   dredd:
     image: apiaryio/dredd:14.0.0
     working_dir: /dredd
-    command: dredd ./openapi.yml http://localhost:3000 --hookfiles="./hooks/hooks.js" --reporter=html
-    # command: echo "hello"
+    command: dredd ./openapi.yml http://prism:4010 --hookfiles="./hooks/hooks.js" --reporter=html --output="./report/report.html"
+    # command: ls -la
     volumes:
       - ./dredd/:/dredd/hooks
       - ./openapi.yml:/dredd/openapi.yml
+      - ./data/dredd:/dredd/report/
+    depends_on:
+      prism: 
+        condition: service_healthy
+  prism:
+    image: stoplight/prism:4.10.1
+    command: mock -h 0.0.0.0 ./openapi.yml
+    healthcheck:
+      test: wget -q -O - http://localhost:4010/users || exit 1
+      interval: 1s
+      timeout: 1s
+      retries: 10
+      start_period: 10s
+    ports:
+      - "4010:4010"
+    volumes: 
+      - ./openapi.yml:/usr/src/prism/packages/cli/openapi.yml
