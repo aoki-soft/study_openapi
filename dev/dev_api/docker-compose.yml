@@ -1,0 +1,9 @@
+version: "3"
+services:
+  api:
+    image: node:18.7.0-bullseye
+    container_name: api
+    working_dir: /api
+    tty: true
+    volumes:
+      - ../../api:/api
