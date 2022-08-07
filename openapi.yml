@@ -3,14 +3,11 @@ info:
   title: sampleapi
   description: 開発のサンプルです
   version: 1.0.0
-servers:
-  - url: http://localhost:3000
-    description: ローカルの開発用サーバー
- 
 paths:
   /users:
     get:
       summary: Get all users.
+      operationId: getUser
       description: Returns an array of User model
       responses:
         '200':
@@ -27,29 +24,29 @@ paths:
                     name:
                       type: string
  
-    post:
-      summary: Create a new User
-      description: Create a new User
-      requestBody:
-        description: user to create
-        content:
-          application/json:
-            schema: # POSTするオブジェクト
-              $ref: '#/components/schemas/User'
-            example:
-              name: post_user
-      responses:
-        '201':
-          description: CREATED
+    # post:
+    #   summary: Create a new User
+    #   description: Create a new User
+    #   requestBody:
+    #     description: user to create
+    #     content:
+    #       application/json:
+    #         schema: # POSTするオブジェクト
+    #           $ref: '#/components/schemas/User'
+    #         example:
+    #           name: post_user
+    #   responses:
+    #     '201':
+    #       description: CREATED
  
-components:
-  schemas: # スキーマオブジェクトの定義
-    User: # モデル名
-      type: object
-      required: # 必須フィールド
-        - name
-      properties:
-        id:
-          type: integer
-        name:
-          type: string
+# components:
+#   schemas: # スキーマオブジェクトの定義
+#     User: # モデル名
+#       type: object
+#       required: # 必須フィールド
+#         - name
+#       properties:
+#         id:
+#           type: integer
+#         name:
+#           type: string
