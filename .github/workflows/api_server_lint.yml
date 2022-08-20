@@ -1,0 +1,13 @@
+name: API Server Lint
+
+on: push
+
+jobs:
+  api_server_lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: docker-compose up
+        run: | 
+          cd ./tests/api_mock_test
+          docker-compose up --abort-on-container-exit
