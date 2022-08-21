@@ -4,14 +4,14 @@ info:
   description: 開発のサンプルです
   version: 1.0.0
 paths:
-  /users:
+  /articles:
     get:
-      summary: Get all users.
-      operationId: getUser
-      description: Returns an array of User model
+      summary: Get all article
+      operationId: getArticles
+      description: Returns an array of articles
       responses:
         '200':
-          description: A JSON array of User model
+          description: ''
           content:
             application/json; charset=utf-8:
               schema:
@@ -19,9 +19,13 @@ paths:
                 items:
                   type: object
                   properties:
+                    result:
+                      type: string
                     id:
                       type: integer
-                    name:
+                    content:
+                      type: string
+                    createdAt:
                       type: string
         '500':
           description: Internal Server Error
@@ -30,5 +34,7 @@ paths:
               schema:
                 type: object
                 properties:
+                  result:
+                    type: string
                   message:
                     type: string

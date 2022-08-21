@@ -9,13 +9,13 @@ import dayjs from "dayjs";
 void (async ()=>{
 	initLogger();
 	const logger = getLogger();
-	logger.addContext("logType", "起動_停止ログ");
+	logger.addContext("logType", "起動ログ");
 
 	const pool = new Pool({
 		host: 'db',
 		database: 'api_db',
 		user: 'admin',
-		password: 'admi',
+		password: 'admin',
 		port: 5432,
 		max: 10
 	})
@@ -55,16 +55,17 @@ void (async ()=>{
 		apiDoc: "/openapi/openapi.yml",
 		validateApiDoc: true,
 		operations: {
-			getUser: [
+			getArticles: [
 				async function (req: Request, res: Response) {
 					const logger = res.locals.logger as Logger;
 					logger.trace({
-						message: "get /users",
+						message: "リクエストを受け取った",
 						...req.body});
 					const resBody = JSON.stringify({
 						result: "Ok",
 						id: 1,
-						name: "hatano"
+						content: "sample content",
+						createdAt: "2022-08-21T06:55:27.738Z"
 					});
 					// DBコネクション取得
 					let dbConnection;
@@ -75,14 +76,16 @@ void (async ()=>{
 							message: "DBコネクション失敗",
 							error: error
 						})
-						const returnBody = {
+						const resCode = 500;
+						const resBody = {
 							result: "Failed",
 							message: "DB Connection Error",
 						};
-						res.send(returnBody);
+						res.send(resBody);
 						logger.trace({
 							message: "レスポンスしました",
-							returnBody: returnBody,
+							resBody: resBody,
+							resCode: resCode
 						});
 						return;
 					}
@@ -95,14 +98,16 @@ void (async ()=>{
 							message: "データ取得失敗",
 							error: error
 						})
-						const returnBody = {
+						const resCode = 500;
+						const resBody = {
 							result: "Failed",
 							message: "DB Query Error",
 						};
-						res.send(returnBody);
+						res.send(resBody);
 						logger.trace({
 							message: "レスポンスしました",
-							returnBody: returnBody,
+							resBody: resBody,
+							resCode: resCode
 						});
 						return;
 					}
@@ -121,8 +126,9 @@ void (async ()=>{
 							error: error
 						})
 					}
-
+					const resCode = 200;
 					logger.trace({resBody: resBody});
+					res.status(resCode);
 					res.send(resBody);
 					logger.trace({message: "レスポンスしました"});
 				}
