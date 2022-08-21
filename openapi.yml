@@ -45,7 +45,7 @@ paths:
                     type: string
     parameters: []
     post:
-      summary: ''
+      summary: Post Articles
       operationId: postArticles
       responses:
         '200':
@@ -61,9 +61,12 @@ paths:
         content:
           application/json:
             schema:
-              type: array
-              items:
-                type: object
-                properties:
-                  content:
-                    type: string
+              type: object
+              properties:
+                articles:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      content:
+                        type: string

@@ -159,27 +159,17 @@ void (async ()=>{
 				}
 			],
 			postArticles: function (req: Request, res: Response) {
+				const logger = res.locals.logger as Logger;
+				logger.trace({
+					message: "トレース",
+					// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+					reqBody: req.body
+				})
 				res.send({
 					result: "Ok"
 				})
 			},
 		},
-		// errorMiddleware: (err, req, res) => {
-		// 	const logger = res.locals.logger as Logger;
-		// 	logger.trace({
-		// 		message: "バリデーションエラーのリクエストを受け取った"
-		// 	})
-		// 	res.status(400);
-		// 	res.send({
-		// 		result: "Failed",
-		// 		message: "Vaildation Error",
-		// 		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-		// 		// error: err
-		// 	})
-		// 	logger.trace({
-		// 		message: "レスポンスしました"
-		// 	})
-		// }
 	});
 
 	app.use((req, res) => {
