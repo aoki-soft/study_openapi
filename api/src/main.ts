@@ -9,12 +9,13 @@ import dayjs from "dayjs";
 void (async ()=>{
 	initLogger();
 	const logger = getLogger();
-	
+	logger.addContext("logType", "起動_停止ログ");
+
 	const pool = new Pool({
 		host: 'db',
 		database: 'api_db',
 		user: 'admin',
-		password: 'admin',
+		password: 'admi',
 		port: 5432,
 		max: 10
 	})
@@ -61,6 +62,7 @@ void (async ()=>{
 						message: "get /users",
 						...req.body});
 					const resBody = JSON.stringify({
+						result: "Ok",
 						id: 1,
 						name: "hatano"
 					});
@@ -73,9 +75,15 @@ void (async ()=>{
 							message: "DBコネクション失敗",
 							error: error
 						})
-						logger.trace({resBody: resBody});
-						res.send(resBody);
-						logger.trace({message: "レスポンスしました"});
+						const returnBody = {
+							result: "Failed",
+							message: "DB Connection Error",
+						};
+						res.send(returnBody);
+						logger.trace({
+							message: "レスポンスしました",
+							returnBody: returnBody,
+						});
 						return;
 					}
 
@@ -87,9 +95,15 @@ void (async ()=>{
 							message: "データ取得失敗",
 							error: error
 						})
-						logger.trace({resBody: resBody});
-						res.send(resBody);
-						logger.trace({message: "レスポンスしました"});
+						const returnBody = {
+							result: "Failed",
+							message: "DB Query Error",
+						};
+						res.send(returnBody);
+						logger.trace({
+							message: "レスポンスしました",
+							returnBody: returnBody,
+						});
 						return;
 					}
 					logger.debug({
@@ -115,6 +129,22 @@ void (async ()=>{
 			]
 		}
 	});
+
+	app.use((req, res) => {
+		const logger = res.locals.logger as Logger;
+		logger.trace({
+			message: "指定外のパスのリクエストを受け取った"
+		})
+		res.status(404);
+		const resBody = {
+			result: "Failed",
+			message: "Not Found"
+		};
+		res.send(resBody)
+		logger.trace({
+			message: "レスポンスしました"
+		})
+	})
 
 	const port = process.env.PORT || 4050;
 	const httpServer = app.listen(port, () => {
