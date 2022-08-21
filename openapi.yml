@@ -15,18 +15,23 @@ paths:
           content:
             application/json; charset=utf-8:
               schema:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    result:
-                      type: string
-                    id:
-                      type: integer
-                    content:
-                      type: string
-                    createdAt:
-                      type: string
+                type: object
+                properties:
+                  result:
+                    type: string
+                  articles:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          minimum: 1
+                        content:
+                          type: string
+                        createdAt:
+                          type: string
+                          format: date-time
         '500':
           description: Internal Server Error
           content:
@@ -37,4 +42,18 @@ paths:
                   result:
                     type: string
                   message:
+                    type: string
+    parameters: []
+    post:
+      summary: ''
+      operationId: postArticles
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
                     type: string

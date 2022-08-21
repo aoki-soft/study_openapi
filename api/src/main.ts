@@ -41,6 +41,7 @@ void (async ()=>{
 		const logger = getLogger();
 		const accessId = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
 		logger.addContext("accessId", accessId);
+		logger.addContext("method", req.method);
 		logger.addContext("url", req.url);
 		logger.addContext("accessTime", dayjs().format())
 		logger.trace({
@@ -63,9 +64,11 @@ void (async ()=>{
 						...req.body});
 					const resBody = JSON.stringify({
 						result: "Ok",
-						id: 1,
-						content: "sample content",
-						createdAt: "2022-08-21T06:55:27.738Z"
+						articles: [{
+							id: 1,
+							content: "sample content",
+							createdAt: "2022-08-21T06:55:27.738Z"
+						}]
 					});
 					// DBコネクション取得
 					let dbConnection;
@@ -132,7 +135,12 @@ void (async ()=>{
 					res.send(resBody);
 					logger.trace({message: "レスポンスしました"});
 				}
-			]
+			],
+			postArticles: function (req: Request, res: Response) {
+				res.send({
+					result: "Ok"
+				})
+			}
 		}
 	});
 
