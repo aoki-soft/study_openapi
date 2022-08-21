@@ -3,10 +3,22 @@ import express, { Request, Response } from "express";
 import { initialize } from "express-openapi";
 import { initLogger } from "./logger";
 import { exit } from "process";
-
+import { Pool } from "pg";
 
 void (async ()=>{
 	initLogger();
+
+	
+	const pool = new Pool({
+		host: 'db',
+		database: 'api_db',
+		user: 'admin',
+		password: 'admin',
+		port: 5432,
+		max: 10
+	})
+
+
 	const logger = getLogger();
 	logger.info({
 		message: "apiサーバ起動開始"
@@ -33,7 +45,7 @@ void (async ()=>{
 		validateApiDoc: true,
 		operations: {
 			getUser: [
-				function (req: Request, res: Response) {
+				async function (req: Request, res: Response) {
 					const logger = res.locals.logger as Logger;
 					logger.trace({
 						message: "get /users",
@@ -42,6 +54,38 @@ void (async ()=>{
 						id: 1,
 						name: "hatano"
 					});
+					logger.trace({
+						message: "DBコネクション取得前",
+						totalCount: pool.totalCount,
+						idleCount: pool.idleCount,
+						waitingCount: pool.waitingCount
+					})
+					 // DBコネクション取得
+					const dbConnection = await pool.connect();
+					logger.trace({
+						message: "DBコネクション取得後",
+						totalCount: pool.totalCount,
+						idleCount: pool.idleCount,
+						waitingCount: pool.waitingCount
+					})
+
+					const result = await dbConnection.query("SELECT * FROM article");
+					
+					// コネクション返却
+    			dbConnection.release();
+					logger.trace({
+						message: "DBコネクション返却後",
+						totalCount: pool.totalCount,
+						idleCount: pool.idleCount,
+						waitingCount: pool.waitingCount
+					})
+
+					logger.debug({
+						message: "データを取得しました",
+						row: result.rows,
+						count: result.rowCount
+					})
+
 					logger.trace({resBody: resBody});
 					res.send(resBody);
 					logger.trace({message: "レスポンス成功"});
