@@ -57,3 +57,13 @@ paths:
                 properties:
                   result:
                     type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  content:
+                    type: string

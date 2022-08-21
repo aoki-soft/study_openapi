@@ -1,5 +1,5 @@
 import {getLogger, Logger} from "log4js";
-import express, { Request, Response } from "express";
+import express, { ErrorRequestHandler, Request, Response } from "express";
 import { initialize } from "express-openapi";
 import { initLogger } from "./logger";
 import { exit } from "process";
@@ -35,8 +35,6 @@ void (async ()=>{
 	});
 
 	const app = express();
-	app.use(express.json());
-	app.use(express.urlencoded({ extended: true }));
 	app.use((req, res, next) => {
 		const logger = getLogger();
 		const accessId = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
@@ -50,6 +48,30 @@ void (async ()=>{
 		res.locals.logger = logger;
 		next();
 	})
+
+	app.use(express.json());
+	app.use(express.urlencoded({ extended: true }));
+
+
+	const errorHandler: ErrorRequestHandler = (err, req, res, next) => {
+		const logger = res.locals.logger as Logger;
+		logger.trace({message: "エラールート"})
+		if (err instanceof SyntaxError && 'status' in err && err["status"] == 400 &&'body' in err) {
+			logger.trace({
+				message: "JSONパース失敗",
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+				error: err
+			})
+			return res.status(400).send({
+				result: "Failed",
+				message: "JSON Parse Error",
+				requestBody: err["body"]
+			});
+		}
+		next();
+	};
+	
+	app.use(errorHandler);
 	
 	await initialize({
 		app: app,
@@ -140,8 +162,24 @@ void (async ()=>{
 				res.send({
 					result: "Ok"
 				})
-			}
-		}
+			},
+		},
+		// errorMiddleware: (err, req, res) => {
+		// 	const logger = res.locals.logger as Logger;
+		// 	logger.trace({
+		// 		message: "バリデーションエラーのリクエストを受け取った"
+		// 	})
+		// 	res.status(400);
+		// 	res.send({
+		// 		result: "Failed",
+		// 		message: "Vaildation Error",
+		// 		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+		// 		// error: err
+		// 	})
+		// 	logger.trace({
+		// 		message: "レスポンスしました"
+		// 	})
+		// }
 	});
 
 	app.use((req, res) => {
