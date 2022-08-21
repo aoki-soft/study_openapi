@@ -7,6 +7,37 @@ services:
     tty: true
     ports:
       - 4050:4050
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: api_db
     volumes:
       - ../../api:/api
       - ../../openapi.yml:/openapi/openapi.yml
+    depends_on:
+      - db
+  db:
+    image: postgres:14-bullseye
+    container_name: postgres
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: api_db
+    volumes:
+      - ../../postgres/init/:/docker-entrypoint-initdb.d
+      - ./data/postgres:/var/lib/postgres/data
+  pgadmin:
+    image: dpage/pgadmin4:6.12
+    ports:
+    - 5080:80
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    depends_on:
+      - db
+volumes:
+  pgadmin-data:
