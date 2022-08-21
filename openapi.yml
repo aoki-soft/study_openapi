@@ -70,3 +70,6 @@ paths:
                     properties:
                       content:
                         type: string
+              required:
+                - articles
+        description: ''

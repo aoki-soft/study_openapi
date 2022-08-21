@@ -72,6 +72,21 @@ void (async ()=>{
 	};
 	
 	app.use(errorHandler);
+
+	const errorMiddleware: ErrorRequestHandler = (err, req, res, next) => {
+		const logger = res.locals.logger as Logger;
+		logger.trace({
+			message: "バリデーション失敗",
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+			error: err
+		})
+		res.status(400);
+		res.send({
+			result: "Failed",
+			message: "Validation Error"
+		})
+	}
+
 	
 	await initialize({
 		app: app,
@@ -170,6 +185,7 @@ void (async ()=>{
 				})
 			},
 		},
+		errorMiddleware: errorMiddleware
 	});
 
 	app.use((req, res) => {
