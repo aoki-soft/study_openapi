@@ -8,7 +8,7 @@ import dayjs from "dayjs";
 
 void (async ()=>{
 	initLogger();
-
+	const logger = getLogger();
 	
 	const pool = new Pool({
 		host: 'db',
@@ -18,9 +18,17 @@ void (async ()=>{
 		port: 5432,
 		max: 10
 	})
+	
+	try {
+		await pool.connect();
+	} catch(error) {
+		logger.error({
+			message: "起動時DBコネクション失敗",
+			error: error
+		})
+		exit(1);
+	}
 
-
-	const logger = getLogger();
 	logger.info({
 		message: "apiサーバ起動開始"
 	});
