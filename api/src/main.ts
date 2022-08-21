@@ -4,6 +4,7 @@ import { initialize } from "express-openapi";
 import { initLogger } from "./logger";
 import { exit } from "process";
 import { Pool } from "pg";
+import dayjs from "dayjs";
 
 void (async ()=>{
 	initLogger();
@@ -31,9 +32,10 @@ void (async ()=>{
 		const logger = getLogger();
 		const accessId = Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
 		logger.addContext("accessId", accessId);
+		logger.addContext("url", req.url);
+		logger.addContext("accessTime", dayjs().format())
 		logger.trace({
 			message: "アクセスログ",
-			path: req.url
 		})
 		res.locals.logger = logger;
 		next();
@@ -54,41 +56,53 @@ void (async ()=>{
 						id: 1,
 						name: "hatano"
 					});
-					logger.trace({
-						message: "DBコネクション取得前",
-						totalCount: pool.totalCount,
-						idleCount: pool.idleCount,
-						waitingCount: pool.waitingCount
-					})
-					 // DBコネクション取得
-					const dbConnection = await pool.connect();
-					logger.trace({
-						message: "DBコネクション取得後",
-						totalCount: pool.totalCount,
-						idleCount: pool.idleCount,
-						waitingCount: pool.waitingCount
-					})
+					// DBコネクション取得
+					let dbConnection;
+					try {
+						dbConnection = await pool.connect();
+					} catch(error) {
+						logger.error({
+							message: "DBコネクション失敗",
+							error: error
+						})
+						logger.trace({resBody: resBody});
+						res.send(resBody);
+						logger.trace({message: "レスポンスしました"});
+						return;
+					}
 
-					const result = await dbConnection.query("SELECT * FROM article");
-					
-					// コネクション返却
-    			dbConnection.release();
-					logger.trace({
-						message: "DBコネクション返却後",
-						totalCount: pool.totalCount,
-						idleCount: pool.idleCount,
-						waitingCount: pool.waitingCount
-					})
-
+					let result;
+					try {
+						result = await dbConnection.query("SELECT * FROM article");
+					} catch(error) {
+						logger.error({
+							message: "データ取得失敗",
+							error: error
+						})
+						logger.trace({resBody: resBody});
+						res.send(resBody);
+						logger.trace({message: "レスポンスしました"});
+						return;
+					}
 					logger.debug({
-						message: "データを取得しました",
+						message: "データを取得した",
 						row: result.rows,
 						count: result.rowCount
 					})
 
+					try {
+						// コネクション返却
+						dbConnection.release();	
+					} catch(error) {
+						logger.warn({
+							message: "コネクション返却失敗",
+							error: error
+						})
+					}
+
 					logger.trace({resBody: resBody});
 					res.send(resBody);
-					logger.trace({message: "レスポンス成功"});
+					logger.trace({message: "レスポンスしました"});
 				}
 			]
 		}

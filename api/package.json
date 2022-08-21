@@ -28,6 +28,7 @@
     "typescript": "^4.7.4"
   },
   "dependencies": {
+    "dayjs": "^1.11.5",
     "express": "^4.18.1",
     "express-openapi": "^12.0.1",
     "log4js": "^6.6.1",
