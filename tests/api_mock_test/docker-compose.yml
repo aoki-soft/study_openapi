@@ -17,7 +17,7 @@ services:
     image: stoplight/prism:4.10.1
     command: mock -h 0.0.0.0 ./openapi.yml
     healthcheck:
-      test: wget -q -O - http://localhost:4010/users || exit 1
+      test: wget -q -O - http://localhost:4010/articles || exit 1
       interval: 1s
       timeout: 1s
       retries: 10
