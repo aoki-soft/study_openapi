@@ -80,11 +80,15 @@ void (async ()=>{
 			// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 			error: err
 		})
-		res.status(400);
-		res.send({
-			result: "Failed",
-			message: "Validation Error"
-		})
+		if ("errors" in err) {
+			res.status(400);
+			res.send({
+				result: "Failed",
+				message: "Validation Error",
+				// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+				errors: err["errors"]
+			})
+		}
 	}
 
 	
