@@ -36,7 +36,8 @@ export function initLogger() {
 
   const config = {
     appenders: {
-      out: { type: "stdout", layout: { type: "json" } },
+      out: { type: "stdout", layout: { type: "pattern", pattern: "%d %[%p%] %f:%l %m" } },
+      // out: { type: "stdout", layout: { type: "json" } },
     },
     categories: {
       default: { appenders: ["out"], level: logLevel, enableCallStack: true },
@@ -54,8 +55,8 @@ export function initLogger() {
     process.exit(1);
   }); 
 
-  logger.info({
-    message: "ロガーセットアップ完了",
-    loggerConfig: config
-  })
+  // logger.info({
+  //   message: "ロガーセットアップ完了",
+  //   loggerConfig: config
+  // })
 }
