@@ -1,4 +1,5 @@
 import {getLogger, Logger} from "log4js";
+import cluster from 'cluster';
 import express, { ErrorRequestHandler, Request, Response, Express } from "express";
 import { initialize } from "express-openapi";
 import { exit } from "process";
@@ -49,13 +50,26 @@ export const workerProcess = async () => {
 	httpServer.addListener("close", closeHttpServer)
 
   process.on("message", (msg: { cmd: string; }) => {
-    logger.info(msg);
+    logger.debug({
+			message: "マスタープロセスからメッセージを取得した",
+			msg,
+		});
     if (msg.cmd && msg.cmd == "SIGTERM") {
       const thisWorker = cluster.worker
       if (thisWorker) {
-        logger.info(`${thisWorker.id} SIGTERMを受け取りました`)
-        server.close((error) => {
-          logger.info("サーバーを終了しました")
+        logger.info({
+					message: `${thisWorker.id} SIGTERMを受け取りました`
+				})
+        httpServer.close((error) => {
+					if (error) {
+						logger.error({
+							message: "httpサーバの正常終了に失敗した"
+						})
+					} else {
+						logger.info({
+							message: "httpサーバーを正常終了した",
+						})
+					}
           exit(0);
         })
       }
