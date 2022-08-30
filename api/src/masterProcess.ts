@@ -2,6 +2,7 @@ import cluster from 'cluster';
 import { cpus } from 'os';
 import process, { exit } from 'process';
 import { getLogger, Logger } from "log4js";
+import { Server } from 'http';
 
 export function masterProcess() {
   const logger = getLogger();
@@ -23,8 +24,8 @@ export function masterProcess() {
   logger.trace({
     message: "初回ワーカーのforkを行った"
   })
-  process.once('SIGTERM', (msg) => {
-    void (async ()=>{
+  process.on('SIGTERM', (msg) => {
+    void (()=>{
       logger.trace({
         message: "SIGTERMを受け取った",
         msg
@@ -32,38 +33,55 @@ export function masterProcess() {
       for (const id in cluster.workers) {
         const worker = cluster.workers[id];
         if (worker) {
-          worker.send({cmd: "SIGTERM"});
-          worker.disconnect();
-          setTimeout(() => {
-            logger.info({
-              message: `ワーカーの正常終了のタイムアウト`,
-              worker: id,
-            })
-            worker.kill();
-          }, 2000);
-          logger.info({
-            message: `ワーカーにSIGTERM通知を送信した`,
-            worker: id,
+          worker.on("message", (msg) => {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            if (msg.cmd == "healthRes") {
+              logger.info({
+                message: "レスポンスを受け取った",
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                msg
+              })
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+              // const httpServer = msg.httpServer as Server;
+              // httpServer.close((error)=> {
+              //   logger.info({
+              //     message: "クローズしました"
+              //   })
+              // });
+            }
           })
+          worker.send({cmd: "health"});
+          // worker.disconnect();
+          // setTimeout(() => {
+          //   logger.info({
+          //     message: `ワーカーの正常終了のタイムアウト`,
+          //     worker: id,
+          //   })
+          //   worker.kill();
+          // }, 2000);
+          // logger.info({
+          //   message: `ワーカーにSIGTERM通知を送信した`,
+          //   worker: id,
+          // })
         }
       }
       logger.trace({
         message: "全ワーカーにSIGTERM通知を送信した"
       })
       // eslint-disable-next-line no-constant-condition
-      while (true) {
-        await new Promise(resolve => setTimeout(resolve, 500))
-        if (cluster.workers) {
-          const numWorker = Object.keys(cluster.workers).length;
-          logger.info(numWorker)
-          if (numWorker == 0) {
-            logger.info({
-              message: "すべてのワーカーが終了した"
-            })
-            exit(0)
-          }
-        }
-      }
+      // while (true) {
+      //   await new Promise(resolve => setTimeout(resolve, 500))
+      //   if (cluster.workers) {
+      //     const numWorker = Object.keys(cluster.workers).length;
+      //     logger.info(numWorker)
+      //     if (numWorker == 0) {
+      //       logger.info({
+      //         message: "すべてのワーカーが終了した"
+      //       })
+      //       exit(0)
+      //     }
+      //   }
+      // }
     })()
   })
 }

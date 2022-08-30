@@ -74,7 +74,15 @@ export const workerProcess = async () => {
         // })
 				exit(0)
       }
-    }
+    } else if(msg.cmd == "health") {
+			httpServer.getConnections((isError, count) => {
+				process.send!({
+					cmd: "healthRes",
+					isError,
+					count
+				})
+			})
+		}
   })
 }
 
