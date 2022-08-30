@@ -23,6 +23,49 @@ export function masterProcess() {
   logger.trace({
     message: "初回ワーカーのforkを行った"
   })
+  process.once('SIGTERM', (msg) => {
+    void (async ()=>{
+      logger.trace({
+        message: "SIGTERMを受け取った",
+        msg
+      });
+      for (const id in cluster.workers) {
+        const worker = cluster.workers[id];
+        if (worker) {
+          worker.send({cmd: "SIGTERM"});
+          worker.disconnect();
+          setTimeout(() => {
+            logger.info({
+              message: `ワーカーの正常終了のタイムアウト`,
+              worker: id,
+            })
+            worker.kill();
+          }, 2000);
+          logger.info({
+            message: `ワーカーにSIGTERM通知を送信した`,
+            worker: id,
+          })
+        }
+      }
+      logger.trace({
+        message: "全ワーカーにSIGTERM通知を送信した"
+      })
+      // eslint-disable-next-line no-constant-condition
+      while (true) {
+        await new Promise(resolve => setTimeout(resolve, 500))
+        if (cluster.workers) {
+          const numWorker = Object.keys(cluster.workers).length;
+          logger.info(numWorker)
+          if (numWorker == 0) {
+            logger.info({
+              message: "すべてのワーカーが終了した"
+            })
+            exit(0)
+          }
+        }
+      }
+    })()
+  })
 }
 
 function forkWoker(logger: Logger, serverId: number)  {
@@ -52,45 +95,4 @@ function forkWoker(logger: Logger, serverId: number)  {
     }
   };
   worker.on("exit", workerExit);
-  let isTerminating = false;
-  const sigtermProcess = () => {
-    logger.trace({
-      message: "SIGTERMを受け取った"
-    });
-    if (isTerminating) {return}
-    isTerminating = true;
-    void (async ()=>{
-      logger.info({
-        message: "アプリケーションの終了を行います"
-      })
-      for (const id in cluster.workers) {
-        const worker = cluster.workers[id];
-        if (worker) {
-          worker.send({cmd: "SIGTERM"});
-          logger.info({
-            message: `ワーカーにSIGTERM通知を送信した`,
-            worker: id,
-          })
-        }
-      }
-      logger.trace({
-        message: "全ワーカーにSIGTERM通知を送信した"
-      })
-      // eslint-disable-next-line no-constant-condition
-      while (true) {
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        if (cluster.workers) {
-          const numWorker = Object.keys(cluster.workers).length;
-          logger.info(numWorker)
-          if (numWorker == 0) {
-            logger.info({
-              message: "すべてのワーカーが終了した"
-            })
-            exit(0)
-          }
-        }
-      }
-    })()
-  };
-  process.on('SIGTERM', sigtermProcess)
 }

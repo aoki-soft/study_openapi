@@ -40,14 +40,14 @@ export const workerProcess = async () => {
 	}
 	httpServer.addListener("listening", okListeng)
 
-	function closeHttpServer() {
-		logger.error({
-			message: "HTTPサーバ終了しました",
-			port: PORT
-		})
-		exit(1)
-	}
-	httpServer.addListener("close", closeHttpServer)
+	// function closeHttpServer() {
+	// 	logger.error({
+	// 		message: "HTTPサーバ終了しました",
+	// 		port: PORT
+	// 	})
+	// 	exit(1)
+	// }
+	// httpServer.addListener("close", closeHttpServer)
 
   process.on("message", (msg: { cmd: string; }) => {
     logger.debug({
@@ -60,18 +60,19 @@ export const workerProcess = async () => {
         logger.info({
 					message: `${thisWorker.id} SIGTERMを受け取りました`
 				})
-        httpServer.close((error) => {
-					if (error) {
-						logger.error({
-							message: "httpサーバの正常終了に失敗した"
-						})
-					} else {
-						logger.info({
-							message: "httpサーバーを正常終了した",
-						})
-					}
-          exit(0);
-        })
+        // httpServer.close((error) => {
+				// 	if (error) {
+				// 		logger.error({
+				// 			message: "httpサーバの正常終了に失敗した"
+				// 		})
+				// 	} else {
+				// 		logger.info({
+				// 			message: "httpサーバーを正常終了した",
+				// 		})
+				// 	}
+        //   exit(0);
+        // })
+				exit(0)
       }
     }
   })
